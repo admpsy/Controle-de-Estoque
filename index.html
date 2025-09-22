@@ -456,6 +456,22 @@
             background-color: #fff3cd;
             color: #856404;
         }
+
+        /* Estilos para seleção de lote */
+        .lote-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .lote-option {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .lote-option:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -645,11 +661,14 @@
                             <div class="row mt-2">
                                 <div class="col-md-4 col-sm-6 col-12">
                                     <label class="form-label">Lote</label>
-                                    <input type="text" class="form-control" id="input-batch">
+                                    <select class="form-select" id="input-batch">
+                                        <option value="">Selecione um lote</option>
+                                    </select>
+                                    <div id="lote-info" class="lote-info"></div>
                                 </div>
                                 <div class="col-md-4 col-sm-6 col-12">
                                     <label class="form-label">Data Fabricação</label>
-                                    <input type="date" class="form-control" id="input-manufacturingDate" required>
+                                    <input type="date" class="form-control" id="input-manufacturingDate">
                                 </div>
                                 <div class="col-md-4 col-12 d-flex align-items-end">
                                     <button type="button" id="add-to-table" class="btn btn-primary btn-responsive">
@@ -672,6 +691,7 @@
                                     <th>Tipo</th>
                                     <th>Lote</th>
                                     <th>Fabricação</th>
+                                    <th>Disponível</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -994,11 +1014,12 @@
                                     <th>Produto</th>
                                     <th>Quantidade</th>
                                     <th>Lote</th>
+                                    <th>Disponível</th>
                                 </tr>
                             </thead>
                             <tbody id="historyTableBody">
                                 <tr>
-                                    <td colspan="5" class="text-center">Nenhum registro encontrado</td>
+                                    <td colspan="6" class="text-center">Nenhum registro encontrado</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1072,6 +1093,12 @@
             // Quando o produto é selecionado na movimentação
             document.getElementById('input-product').addEventListener('change', function() {
                 updateProductDetails();
+                loadLotesForProduct();
+            });
+
+            // Quando o tipo de movimento é alterado
+            document.getElementById('input-movementType').addEventListener('change', function() {
+                loadLotesForProduct();
             });
 
             // Botão de adicionar item à tabela (movimentação)
@@ -1181,6 +1208,107 @@
             return reportNumber;
         }
 
+        // Função para carregar lotes para o produto selecionado
+        function loadLotesForProduct() {
+            const productSKU = document.getElementById('input-product').value;
+            const movementType = document.getElementById('input-movementType').value;
+            const batchSelect = document.getElementById('input-batch');
+            const loteInfo = document.getElementById('lote-info');
+            const manufacturingDateInput = document.getElementById('input-manufacturingDate');
+            
+            batchSelect.innerHTML = '<option value="">Selecione um lote</option>';
+            loteInfo.innerHTML = '';
+            manufacturingDateInput.value = '';
+            
+            if (!productSKU) return;
+            
+            // Obter produtos do estoque
+            const productsData = JSON.parse(localStorage.getItem('productsData') || '[]');
+            
+            if (movementType === 'Entrada') {
+                // Para entrada, permitir novo lote ou lote existente
+                batchSelect.innerHTML += '<option value="**NOVO_LOTE**">++ Novo Lote ++</option>';
+                
+                // Agrupar lotes existentes por lote
+                const lotesExistentes = {};
+                productsData.filter(p => p.SKU === productSKU).forEach(product => {
+                    const lote = product.Lote || 'Sem Lote';
+                    if (!lotesExistentes[lote]) {
+                        lotesExistentes[lote] = {
+                            lote: lote,
+                            quantidade: 0,
+                            fabricacao: product['Data Fabricação']
+                        };
+                    }
+                    lotesExistentes[lote].quantidade += product.Quantidade;
+                });
+                
+                // Adicionar lotes existentes
+                Object.values(lotesExistentes).forEach(lote => {
+                    const option = document.createElement('option');
+                    option.value = lote.lote;
+                    option.textContent = `${lote.lote} (${lote.quantidade} disponíveis)`;
+                    option.setAttribute('data-fabricacao', lote.fabricacao);
+                    batchSelect.appendChild(option);
+                });
+                
+                loteInfo.innerHTML = 'Para entrada, selecione um lote existente ou crie um novo.';
+                
+            } else if (movementType === 'Saída' || movementType === 'Devolução') {
+                // Para saída, mostrar apenas lotes com quantidade disponível
+                const lotesDisponiveis = productsData.filter(p => 
+                    p.SKU === productSKU && p.Quantidade > 0
+                );
+                
+                if (lotesDisponiveis.length === 0) {
+                    batchSelect.innerHTML = '<option value="">Nenhum lote disponível</option>';
+                    loteInfo.innerHTML = '<span class="text-danger">Nenhum lote disponível para este produto.</span>';
+                    return;
+                }
+                
+                // Ordenar por data de fabricação (FIFO)
+                lotesDisponiveis.sort((a, b) => new Date(a['Data Fabricação']) - new Date(b['Data Fabricação']));
+                
+                // Agrupar por lote
+                const lotesAgrupados = {};
+                lotesDisponiveis.forEach(product => {
+                    const lote = product.Lote || 'Sem Lote';
+                    if (!lotesAgrupados[lote]) {
+                        lotesAgrupados[lote] = {
+                            lote: lote,
+                            quantidade: 0,
+                            fabricacao: product['Data Fabricação'],
+                            produtos: []
+                        };
+                    }
+                    lotesAgrupados[lote].quantidade += product.Quantidade;
+                    lotesAgrupados[lote].produtos.push(product);
+                });
+                
+                // Adicionar opções
+                Object.values(lotesAgrupados).forEach(lote => {
+                    const option = document.createElement('option');
+                    option.value = lote.lote;
+                    option.textContent = `${lote.lote} (${lote.quantidade} disponíveis)`;
+                    option.setAttribute('data-fabricacao', lote.fabricacao);
+                    option.setAttribute('data-produtos', JSON.stringify(lote.produtos));
+                    batchSelect.appendChild(option);
+                });
+                
+                loteInfo.innerHTML = 'Para saída, o sistema usará o método FIFO (primeiro a entrar, primeiro a sair).';
+            }
+            
+            // Event listener para quando o lote é selecionado
+            batchSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value && selectedOption.getAttribute('data-fabricacao')) {
+                    manufacturingDateInput.value = selectedOption.getAttribute('data-fabricacao');
+                } else {
+                    manufacturingDateInput.value = '';
+                }
+            });
+        }
+
         // Função para carregar dados do histórico
         function loadHistoryData() {
             const historyData = JSON.parse(localStorage.getItem('movementHistory') || '[]');
@@ -1189,7 +1317,7 @@
             tbody.innerHTML = '';
             
             if (historyData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum registro encontrado</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum registro encontrado</td></tr>';
                 return;
             }
             
@@ -1204,6 +1332,7 @@
                     <td>${item.productName}</td>
                     <td>${item.quantity}</td>
                     <td>${item.batch || 'N/A'}</td>
+                    <td>${item.remainingQuantity !== undefined ? item.remainingQuantity : 'N/A'}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1291,10 +1420,11 @@
                 Produto: product,
                 Tipo: type,
                 Quantidade: parseInt(quantity),
-                Lote: batch || 'N/A',
+                Lote: batch || 'Sem Lote',
                 'Data Fabricação': manufacturingDate,
                 Entradas: parseInt(quantity),
-                Saídas: 0
+                Saídas: 0,
+                id: Date.now() // ID único para cada item
             });
             
             // Salvar no localStorage
@@ -1339,10 +1469,11 @@
                 Produto: baseProduct.Produto,
                 Tipo: baseProduct.Tipo,
                 Quantidade: parseInt(quantity),
-                Lote: batch || 'N/A',
+                Lote: batch || 'Sem Lote',
                 'Data Fabricação': manufacturingDate,
                 Entradas: parseInt(quantity),
-                Saídas: 0
+                Saídas: 0,
+                id: Date.now() // ID único para cada item
             });
             
             // Salvar no localStorage
@@ -1389,7 +1520,7 @@
                 document.getElementById('edit-product-name').value = product.Produto;
                 document.getElementById('edit-product-type').value = product.Tipo;
                 document.getElementById('edit-product-quantity').value = product.Quantidade;
-                document.getElementById('edit-product-batch').value = product.Lote === 'N/A' ? '' : product.Lote;
+                document.getElementById('edit-product-batch').value = product.Lote === 'Sem Lote' ? '' : product.Lote;
                 document.getElementById('edit-product-manufacturing-date').value = product['Data Fabricação'];
                 
                 // Mostrar modal de edição
@@ -1425,7 +1556,7 @@
                     Produto: product,
                     Tipo: type,
                     Quantidade: parseInt(quantity),
-                    Lote: batch || 'N/A',
+                    Lote: batch || 'Sem Lote',
                     'Data Fabricação': manufacturingDate
                 };
                 
@@ -1475,15 +1606,25 @@
             const productSelect = document.getElementById('input-product');
             const productSKU = productSelect.value;
             const productText = productSelect.options[productSelect.selectedIndex].text;
-            const quantity = document.getElementById('input-quantity').value;
+            const quantity = parseInt(document.getElementById('input-quantity').value);
             const productType = document.getElementById('input-productType').value;
-            const batch = document.getElementById('input-batch').value;
+            const batchSelect = document.getElementById('input-batch');
+            const batch = batchSelect.value;
             const manufacturingDate = document.getElementById('input-manufacturingDate').value;
             
             // Validar campos
-            if (!date || !productSKU || !quantity || !manufacturingDate) {
+            if (!date || !productSKU || !quantity || !batch) {
                 alert('Por favor, preencha todos os campos obrigatórios!');
                 return;
+            }
+            
+            // Validar quantidade para saída
+            if (movementType === 'Saída' || movementType === 'Devolução') {
+                const availableQuantity = getAvailableQuantity(productSKU, batch);
+                if (quantity > availableQuantity) {
+                    alert(`Quantidade indisponível! Disponível: ${availableQuantity}`);
+                    return;
+                }
             }
             
             // Extrair nome do produto do texto do option
@@ -1495,10 +1636,11 @@
                 movementType,
                 productSKU,
                 productName,
-                quantity: parseInt(quantity),
+                quantity: quantity,
                 productType,
-                batch: batch || 'N/A',
-                manufacturingDate
+                batch: batch === '**NOVO_LOTE**' ? 'Novo Lote' : batch,
+                manufacturingDate,
+                availableQuantity: movementType === 'Entrada' ? quantity : getAvailableQuantity(productSKU, batch)
             };
             
             productsList.push(productData);
@@ -1509,14 +1651,23 @@
             // Limpar o formulário (exceto data e tipo de movimento)
             document.getElementById('input-product').value = '';
             document.getElementById('input-quantity').value = '1';
-            document.getElementById('input-batch').value = '';
+            document.getElementById('input-batch').innerHTML = '<option value="">Selecione um lote</option>';
             document.getElementById('input-productType').value = '';
+            document.getElementById('input-manufacturingDate').value = '';
+            document.getElementById('lote-info').innerHTML = '';
             
             // Focar no campo de produto para próxima entrada
             document.getElementById('input-product').focus();
             
             // Mostrar mensagem de sucesso
             alert('Produto adicionado à tabela!');
+        }
+
+        // Função para obter quantidade disponível de um lote
+        function getAvailableQuantity(productSKU, batch) {
+            const productsData = JSON.parse(localStorage.getItem('productsData') || '[]');
+            const lotes = productsData.filter(p => p.SKU === productSKU && p.Lote === batch && p.Quantidade > 0);
+            return lotes.reduce((total, p) => total + p.Quantidade, 0);
         }
 
         function updateProductsTable() {
@@ -1542,6 +1693,7 @@
                     <td>${product.productType}</td>
                     <td>${product.batch}</td>
                     <td>${formatDate(product.manufacturingDate)}</td>
+                    <td>${product.availableQuantity}</td>
                     <td class="text-center">
                         <button class="btn btn-sm btn-warning table-action-btn edit-product" data-index="${index}" title="Alterar item">
                             <i class="bi bi-pencil"></i>
@@ -1630,12 +1782,13 @@
                 product.quantity,
                 product.productType,
                 product.batch,
-                formatDate(product.manufacturingDate)
+                formatDate(product.manufacturingDate),
+                product.availableQuantity
             ]);
             
             doc.autoTable({
                 startY: 35,
-                head: [['Data', 'Movimento', 'Produto', 'Quantidade', 'Tipo', 'Lote', 'Fabrição']],
+                head: [['Data', 'Movimento', 'Produto', 'Quantidade', 'Tipo', 'Lote', 'Fabrição', 'Disponível']],
                 body: tableData,
                 theme: 'grid'
             });
@@ -1709,7 +1862,7 @@
             alert('Relatório de estoque exportado com sucesso!');
         }
 
-        // Função para atualizar o estoque com base na movimentação
+        // Função para atualizar o estoque com base na movimentação (FIFO)
         function updateStockFromMovement() {
             // Obter produtos do estoque
             let productsData = JSON.parse(localStorage.getItem('productsData') || '[]');
@@ -1717,8 +1870,8 @@
             // Para cada produto na movimentação, atualizar o estoque
             productsList.forEach(movement => {
                 if (movement.movementType === 'Entrada') {
-                    // Adicionar novo lote ao estoque
-                    productsData.push({
+                    // Para entrada, adicionar novo item ao estoque
+                    const newProduct = {
                         SKU: movement.productSKU,
                         Produto: movement.productName,
                         Tipo: movement.productType,
@@ -1726,47 +1879,74 @@
                         Lote: movement.batch,
                         'Data Fabricação': movement.manufacturingDate,
                         Entradas: movement.quantity,
-                        Saídas: 0
-                    });
+                        Saídas: 0,
+                        id: Date.now()
+                    };
                     
-                    // Salvar também no histórico de movimentações
-                    saveToMovementHistory(movement);
+                    productsData.push(newProduct);
+                    
+                    // Salvar no histórico de movimentações
+                    saveToMovementHistory(movement, movement.quantity);
+                    
                 } else if (movement.movementType === 'Saída') {
-                    // Implementar lógica FIFO (First In, First Out) para saídas
+                    // Para saída, usar método FIFO
                     let remainingQuantity = movement.quantity;
+                    const movimentacaoLotes = [];
                     
-                    // Ordenar lotes por data de fabricação (mais antigos primeiro)
-                    const productLotes = productsData
-                        .filter(p => p.SKU === movement.productSKU)
+                    // Ordenar produtos por data de fabricação (mais antigos primeiro)
+                    const produtosOrdenados = productsData
+                        .filter(p => p.SKU === movement.productSKU && p.Quantidade > 0)
                         .sort((a, b) => new Date(a['Data Fabricação']) - new Date(b['Data Fabricação']));
                     
-                    // Baixar quantidade dos lotes mais antigos primeiro
-                    for (let lote of productLotes) {
+                    // Processar saída por lote (FIFO)
+                    for (let produto of produtosOrdenados) {
                         if (remainingQuantity <= 0) break;
                         
-                        const index = productsData.findIndex(p => 
-                            p.SKU === lote.SKU && p.Lote === lote.Lote && p['Data Fabricação'] === lote['Data Fabricação']
-                        );
+                        const quantidadeDisponivel = produto.Quantidade;
+                        const quantidadeUsar = Math.min(remainingQuantity, quantidadeDisponivel);
                         
-                        if (index !== -1) {
-                            const availableQuantity = productsData[index].Quantidade;
-                            const quantityToDeduct = Math.min(remainingQuantity, availableQuantity);
-                            
-                            productsData[index].Quantidade -= quantityToDeduct;
-                            productsData[index].Saídas += quantityToDeduct;
-                            remainingQuantity -= quantityToDeduct;
-                            
-                            // Remover lote se quantidade chegar a zero
-                            if (productsData[index].Quantidade <= 0) {
-                                productsData.splice(index, 1);
-                            }
-                        }
+                        // Registrar movimentação do lote
+                        movimentacaoLotes.push({
+                            lote: produto.Lote,
+                            quantidade: quantidadeUsar,
+                            disponivelAntes: quantidadeDisponivel
+                        });
+                        
+                        // Atualizar quantidade no estoque
+                        produto.Quantidade -= quantidadeUsar;
+                        produto.Saídas += quantidadeUsar;
+                        remainingQuantity -= quantidadeUsar;
                     }
                     
-                    // Salvar também no histórico de movimentações
-                    saveToMovementHistory(movement);
+                    // Salvar detalhes da movimentação no histórico
+                    movement.lotesUtilizados = movimentacaoLotes;
+                    movement.remainingQuantity = remainingQuantity;
+                    saveToMovementHistory(movement, movement.quantity - remainingQuantity);
+                    
+                } else if (movement.movementType === 'Devolução') {
+                    // Para devolução, similar à entrada mas com registro específico
+                    const newProduct = {
+                        SKU: movement.productSKU,
+                        Produto: movement.productName,
+                        Tipo: movement.productType,
+                        Quantidade: movement.quantity,
+                        Lote: movement.batch,
+                        'Data Fabricação': movement.manufacturingDate,
+                        Entradas: movement.quantity,
+                        Saídas: 0,
+                        id: Date.now(),
+                        isDevolucao: true
+                    };
+                    
+                    productsData.push(newProduct);
+                    
+                    // Salvar no histórico de movimentações
+                    saveToMovementHistory(movement, movement.quantity);
                 }
             });
+            
+            // Remover produtos com quantidade zero
+            productsData = productsData.filter(p => p.Quantidade > 0);
             
             // Salvar no localStorage
             localStorage.setItem('productsData', JSON.stringify(productsData));
@@ -1787,14 +1967,16 @@
         }
 
         // Função para salvar movimentação no histórico
-        function saveToMovementHistory(movement) {
+        function saveToMovementHistory(movement, quantidadeProcessada) {
             let movementHistory = JSON.parse(localStorage.getItem('movementHistory') || '[]');
             
             // Adicionar ID único e timestamp
             movementHistory.push({
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
-                ...movement
+                ...movement,
+                quantidadeProcessada: quantidadeProcessada,
+                remainingQuantity: movement.remainingQuantity || 0
             });
             
             localStorage.setItem('movementHistory', JSON.stringify(movementHistory));
@@ -1820,7 +2002,8 @@
                         Lote: "LOTE-001",
                         'Data Fabricação': "2022-05-15",
                         Entradas: 50,
-                        Saídas: 0
+                        Saídas: 0,
+                        id: 1
                     },
                     { 
                         SKU: "PROD001", 
@@ -1830,7 +2013,8 @@
                         Lote: "LOTE-002",
                         'Data Fabricação': "2023-01-20",
                         Entradas: 100,
-                        Saídas: 0
+                        Saídas: 0,
+                        id: 2
                     },
                     { 
                         SKU: "PROD002", 
@@ -1840,7 +2024,8 @@
                         Lote: "LOTE-003",
                         'Data Fabricação': "2021-10-18",
                         Entradas: 75,
-                        Saídas: 0
+                        Saídas: 0,
+                        id: 3
                     },
                     { 
                         SKU: "PROD003", 
@@ -1850,7 +2035,8 @@
                         Lote: "LOTE-004",
                         'Data Fabricação': "2023-03-10",
                         Entradas: 200,
-                        Saídas: 0
+                        Saídas: 0,
+                        id: 4
                     }
                 ];
                 localStorage.setItem('productsData', JSON.stringify(productsData));
@@ -1968,6 +2154,9 @@
                 
                 // Linhas de detalhes (lotes) - se expandido
                 if (group.expanded) {
+                    // Ordenar lotes por data de fabricação
+                    group.Lotes.sort((a, b) => new Date(a['Data Fabricação']) - new Date(b['Data Fabricação']));
+                    
                     group.Lotes.forEach((lote, loteIndex) => {
                         // Calcular data de vencimento (4 anos após a fabricação)
                         const expiryDate = calculateExpiryDate(lote['Data Fabricação']);
@@ -1983,13 +2172,13 @@
                             <td class="batch-details"></td>
                             <td class="batch-details"></td>
                             <td>${lote.Quantidade}</td>
-                            <td>${lote.Lote || 'N/A'}</td>
+                            <td>${lote.Lote || 'Sem Lote'}</td>
                             <td class="text-center">
                                 <span class="${statusInfo.class}">${statusInfo.status}</span>
-                                <button class="btn btn-sm btn-warning ms-2 edit-lote-btn" data-index="${productsData.findIndex(p => p.SKU === lote.SKU && p.Lote === lote.Lote)}" title="Editar lote">
+                                <button class="btn btn-sm btn-warning ms-2 edit-lote-btn" data-index="${productsData.findIndex(p => p.id === lote.id)}" title="Editar lote">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger ms-1 delete-lote-btn" data-index="${productsData.findIndex(p => p.SKU === lote.SKU && p.Lote === lote.Lote)}" title="Excluir lote">
+                                <button class="btn btn-sm btn-danger ms-1 delete-lote-btn" data-index="${productsData.findIndex(p => p.id === lote.id)}" title="Excluir lote">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </td>
@@ -2018,7 +2207,9 @@
                             <td colspan="3">
                                 <small>
                                     <strong>Fabricação:</strong> ${formatDate(lote['Data Fabricação'])} | 
-                                    <strong>Vencimento:</strong> ${formatDate(expiryDate)}
+                                    <strong>Vencimento:</strong> ${formatDate(expiryDate)} |
+                                    <strong>Entradas:</strong> ${lote.Entradas} |
+                                    <strong>Saídas:</strong> ${lote.Saídas}
                                 </small>
                             </td>
                         `;
