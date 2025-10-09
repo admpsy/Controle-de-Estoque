@@ -846,55 +846,58 @@
                                 <h5 class="mb-0">Movimentações Recentes</h5>
                             </div>
                             <div class="card-body">
-                            <ul class="nav nav-tabs" id="dashboardMovementTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="dashboard-paletes-tab" data-bs-toggle="tab" data-bs-target="#dashboard-paletes-tab-pane" type="button" role="tab">Paletes</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="dashboard-products-tab" data-bs-toggle="tab" data-bs-target="#dashboard-products-tab-pane" type="button" role="tab">Produtos por Tipo</button>
-    </li>
-</ul>
-                               <div class="tab-content mt-3" id="dashboardMovementTabsContent">
-    <div class="tab-pane fade show active" id="dashboard-paletes-tab-pane" role="tabpanel">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Tipo</th>
-                        <th>Movimento</th>
-                        <th>Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody id="recent-paletes-movements">
-                    <tr>
-                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="dashboard-products-tab-pane" role="tabpanel">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Produto</th>
-                        <th>Tipo</th>
-                        <th>Movimento</th>
-                        <th>Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody id="recent-products-movements">
-                    <tr>
-                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                                <ul class="nav nav-tabs" id="movementTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="paletes-tab" data-bs-toggle="tab" data-bs-target="#paletes-tab-pane" type="button" role="tab">Paletes</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produtos por Tipo</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content mt-3" id="movementTabsContent">
+                                    <div class="tab-pane fade show active" id="paletes-tab-pane" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data</th>
+                                                        <th>Tipo</th>
+                                                        <th>Movimento</th>
+                                                        <th>Quantidade</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="recent-paletes-movements">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="products-tab-pane" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data</th>
+                                                        <th>Produto</th>
+                                                        <th>Tipo</th>
+                                                        <th>Movimento</th>
+                                                        <th>Quantidade</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="recent-products-movements">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-4 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -1335,7 +1338,7 @@
     <!-- NOVO: Rodapé com créditos -->
     <div class="credits-footer">
         <div class="container">
-            <p>Sistema desenvolvido por <strong>[Aldemir Garbino]</strong> com auxílio de IA</p>
+            <p>Sistema Desenvolvido por <strong>[Aldemir Garbino]</strong> Com auxílio de IA</p>
             <p class="mb-0">© 2025 - Todos os direitos reservados</p>
         </div>
     </div>
@@ -2618,7 +2621,7 @@
             
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movientação BlueWay', 14, yPosition);
+            doc.text('Relatório de Movimentação BlueWay', 14, yPosition);
             
             doc.save('relatorio_paletes.pdf');
             alert('PDF de movimentação de paletes gerado com sucesso!');
@@ -2663,7 +2666,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2708,7 +2711,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2843,7 +2846,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3479,7 +3482,7 @@
             const finalY = doc.lastAutoTable.finalY + 20;
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movientação BlueWay', 14, finalY);
+            doc.text('Relatório de Movimentação BlueWay', 14, finalY);
             
             // Salvar o PDF
             const fileName = `relatorio_movimentacao_${reportNumber}_${reportDate}.pdf`;
@@ -4166,13 +4169,9 @@
 
     // 3. Retorna a data formatada como "DD/MM/YYYY"
     return `${day}/${month}/${year}`;
-}   
-        
+}
     </script>
 </body>
 </html>
-
-
-
 
 
