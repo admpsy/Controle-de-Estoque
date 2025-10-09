@@ -4083,7 +4083,7 @@
             });
             
             // Remover produtos com quantidade zero
-           // productsData = productsData.filter(p => p.Quantidade > 0);
+            productsData = productsData.filter(p => p.Quantidade > 0);
             
             // Salvar no localStorage
             localStorage.setItem('productsData', JSON.stringify(productsData));
@@ -4173,5 +4173,6 @@
     </script>
 </body>
 </html>
+
 
 
