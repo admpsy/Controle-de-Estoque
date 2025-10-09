@@ -846,58 +846,55 @@
                                 <h5 class="mb-0">Movimentações Recentes</h5>
                             </div>
                             <div class="card-body">
-                                <ul class="nav nav-tabs" id="movementTabs" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="paletes-tab" data-bs-toggle="tab" data-bs-target="#paletes-tab-pane" type="button" role="tab">Paletes</button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produtos por Tipo</button>
-                                    </li>
-                                </ul>
-                                <div class="tab-content mt-3" id="movementTabsContent">
-                                    <div class="tab-pane fade show active" id="paletes-tab-pane" role="tabpanel">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Data</th>
-                                                        <th>Tipo</th>
-                                                        <th>Movimento</th>
-                                                        <th>Quantidade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recent-paletes-movements">
-                                                    <tr>
-                                                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="products-tab-pane" role="tabpanel">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Data</th>
-                                                        <th>Produto</th>
-                                                        <th>Tipo</th>
-                                                        <th>Movimento</th>
-                                                        <th>Quantidade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recent-products-movements">
-                                                    <tr>
-                                                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            <ul class="nav nav-tabs" id="dashboardMovementTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="dashboard-paletes-tab" data-bs-toggle="tab" data-bs-target="#dashboard-paletes-tab-pane" type="button" role="tab">Paletes</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="dashboard-products-tab" data-bs-toggle="tab" data-bs-target="#dashboard-products-tab-pane" type="button" role="tab">Produtos por Tipo</button>
+    </li>
+</ul>
+                               <div class="tab-content mt-3" id="dashboardMovementTabsContent">
+    <div class="tab-pane fade show active" id="dashboard-paletes-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Movimento</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-paletes-movements">
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="dashboard-products-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Movimento</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-products-movements">
+                    <tr>
+                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
                     <div class="col-md-4 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -4169,39 +4166,12 @@
 
     // 3. Retorna a data formatada como "DD/MM/YYYY"
     return `${day}/${month}/${year}`;
-}
-
-
-   // Adicione este código na função setupEventListeners() ou no final do script
-document.addEventListener('DOMContentLoaded', function() {
-    // Corrigir problema das abas do dashboard
-    const dashboardTabButtons = document.querySelectorAll('#movementTabs .nav-link');
-    dashboardTabButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = this.getAttribute('data-bs-target');
-            
-            // Esconder todas as abas
-            document.querySelectorAll('#movementTabsContent .tab-pane').forEach(pane => {
-                pane.classList.remove('show', 'active');
-            });
-            
-            // Mostrar a aba clicada
-            const targetPane = document.querySelector(target);
-            if (targetPane) {
-                targetPane.classList.add('show', 'active');
-            }
-            
-            // Atualizar estado ativo dos botões
-            dashboardTabButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-});     
+}   
         
     </script>
 </body>
 </html>
+
 
 
 
