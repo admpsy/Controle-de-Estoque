@@ -734,66 +734,6 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-
-/* Adicione isso na seção de estilo do CSS */
-.expiring-products-list {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.expiring-product-item {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s;
-}
-
-.expiring-product-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.expiring-product-item:last-child {
-    border-bottom: none;
-}
-
-.expiring-product-info {
-    flex: 1;
-}
-
-.expiring-product-name {
-    font-weight: 600;
-    color: var(--text-light);
-    margin-bottom: 4px;
-}
-
-.expiring-product-details {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    line-height: 1.4;
-}
-
-/* Garantir que as colunas fiquem lado a lado */
-@media (min-width: 768px) {
-    .col-md-8 {
-        flex: 0 0 auto;
-        width: 66.66666667%;
-    }
-    
-    .col-md-4 {
-        flex: 0 0 auto;
-        width: 33.33333333%;
-    }
-}
-
-/* Ajustes para telas menores */
-@media (max-width: 767.98px) {
-    .col-md-8, .col-md-4 {
-        flex: 0 0 auto;
-        width: 100%;
-    }
-}
-
-        
-        
     </style>
 </head>
 <body>
@@ -900,106 +840,102 @@
                 </div>
 
                 <div class="row">
-    <div class="col-md-8 mb-4">
-        <!-- CARD DE MOVIMENTAÇÕES RECENTES (coloque aqui o código das abas que já funciona) -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Movimentações Recentes</h5>
-            </div>
-            <div class="card-body">
-                <div class="btn-group w-100 mb-3" role="group">
-                    <button type="button" class="btn btn-primary active" id="show-paletes-btn">
-                        <i class="bi bi-pallet me-1"></i>Paletes
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" id="show-products-btn">
-                        <i class="bi bi-boxes me-1"></i>Produtos por Tipo
-                    </button>
-                </div>
-                
-                <!-- Conteúdo Paletes -->
-                <div id="paletes-content" class="tab-content">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Movimento</th>
-                                    <th>Quantidade</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-paletes-movements">
-                                <tr>
-                                    <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="col-md-8 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Movimentações Recentes</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="movementTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="paletes-tab" data-bs-toggle="tab" data-bs-target="#paletes-tab-pane" type="button" role="tab">Paletes</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="products-tab" data-bs-toggle="tab" data-bs-target="#products-tab-pane" type="button" role="tab">Produtos por Tipo</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content mt-3" id="movementTabsContent">
+                                    <div class="tab-pane fade show active" id="paletes-tab-pane" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data</th>
+                                                        <th>Tipo</th>
+                                                        <th>Movimento</th>
+                                                        <th>Quantidade</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="recent-paletes-movements">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="products-tab-pane" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Data</th>
+                                                        <th>Produto</th>
+                                                        <th>Tipo</th>
+                                                        <th>Movimento</th>
+                                                        <th>Quantidade</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="recent-products-movements">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Status de Produtos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <span class="status-valid">Dentro do Prazo</span>
+                                    <span id="count-valid" class="fw-bold">0</span>
+                                </div>
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <span class="status-warning">Vencimento Próximo</span>
+                                    <span id="count-warning" class="fw-bold">0</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="status-expired">Vencidos</span>
+                                    <span id="count-expired" class="fw-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- NOVA SEÇÃO: Produtos com Vencimento Próximo ou Vencidos -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Produtos com Vencimento Próximo ou Vencidos</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="expiring-products-list" id="expiring-products-list">
+                                    <!-- Itens serão carregados dinamicamente aqui -->
+                                    <div class="text-center p-3 text-muted">
+                                        Nenhum produto com vencimento próximo ou vencido
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Conteúdo Produtos -->
-                <div id="products-content" class="tab-content" style="display: none;">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Produto</th>
-                                    <th>Tipo</th>
-                                    <th>Movimento</th>
-                                    <th>Quantidade</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-products-movements">
-                                <tr>
-                                    <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- COLUNA LATERAL DIREITA -->
-    <div class="col-md-4 mb-4">
-        <!-- Status de Produtos -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Status de Produtos</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3 d-flex justify-content-between align-items-center">
-                    <span class="status-valid">Dentro do Prazo</span>
-                    <span id="count-valid" class="fw-bold">0</span>
-                </div>
-                <div class="mb-3 d-flex justify-content-between align-items-center">
-                    <span class="status-warning">Vencimento Próximo</span>
-                    <span id="count-warning" class="fw-bold">0</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="status-expired">Vencidos</span>
-                    <span id="count-expired" class="fw-bold">0</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Produtos com Vencimento Próximo ou Vencidos -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Produtos com Vencimento Próximo ou Vencidos</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="expiring-products-list" id="expiring-products-list" style="max-height: 300px; overflow-y: auto;">
-                    <div class="text-center p-3 text-muted">
-                        Nenhum produto com vencimento próximo ou vencido
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
             <!-- Tela de Relatório de Estoque -->
             <div id="stock-report-page" class="page">
@@ -1402,7 +1338,7 @@
     <!-- NOVO: Rodapé com créditos -->
     <div class="credits-footer">
         <div class="container">
-            <p>Sistema Desenvolvido por <strong>[Aldemir Garbino]</strong> Com auxílio de IA</p>
+            <p>Sistema desenvolvido por <strong>[Aldemir Garbino]</strong> com auxílio de IA</p>
             <p class="mb-0">© 2025 - Todos os direitos reservados</p>
         </div>
     </div>
@@ -2685,7 +2621,7 @@
             
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movimentação BlueWay', 14, yPosition);
+            doc.text('Relatório de Movientação BlueWay', 14, yPosition);
             
             doc.save('relatorio_paletes.pdf');
             alert('PDF de movimentação de paletes gerado com sucesso!');
@@ -2730,7 +2666,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movimentação BlueWay']);
+            data.push(['Relatório de Movientação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2775,7 +2711,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movimentação BlueWay']);
+            data.push(['Relatório de Movientação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2910,7 +2846,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movimentação BlueWay']);
+            data.push(['Relatório de Movientação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3546,7 +3482,7 @@
             const finalY = doc.lastAutoTable.finalY + 20;
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movimentação BlueWay', 14, finalY);
+            doc.text('Relatório de Movientação BlueWay', 14, finalY);
             
             // Salvar o PDF
             const fileName = `relatorio_movimentacao_${reportNumber}_${reportDate}.pdf`;
@@ -4233,40 +4169,9 @@
 
     // 3. Retorna a data formatada como "DD/MM/YYYY"
     return `${day}/${month}/${year}`;
-}       
-
-// Controle das abas do Dashboard - COLOCAR NO FINAL DO SCRIPT
-document.addEventListener('DOMContentLoaded', function() {
-    // Controle simples das abas do Dashboard
-    const showPaletesBtn = document.getElementById('show-paletes-btn');
-    const showProductsBtn = document.getElementById('show-products-btn');
-    const paletesContent = document.getElementById('paletes-content');
-    const productsContent = document.getElementById('products-content');
-    
-    if (showPaletesBtn && showProductsBtn) {
-        showPaletesBtn.addEventListener('click', function() {
-            paletesContent.style.display = 'block';
-            productsContent.style.display = 'none';
-            showPaletesBtn.className = 'btn btn-primary active';
-            showProductsBtn.className = 'btn btn-outline-primary';
-        });
-
-        showProductsBtn.addEventListener('click', function() {
-            paletesContent.style.display = 'none';
-            productsContent.style.display = 'block';
-            showPaletesBtn.className = 'btn btn-outline-primary';
-            showProductsBtn.className = 'btn btn-primary active';
-        });
-    }
-});
-
-        
+}
     </script>
 </body>
 </html>
-
-
-
-
 
 
