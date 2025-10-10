@@ -4169,40 +4169,11 @@
 
     // 3. Retorna a data formatada como "DD/MM/YYYY"
     return `${day}/${month}/${year}`;
-}
-
-// Adicione este código na função setupEventListeners() ou no final do script
-document.addEventListener('DOMContentLoaded', function() {
-    // Corrigir problema das abas do dashboard
-    const dashboardTabButtons = document.querySelectorAll('#movementTabs .nav-link');
-    dashboardTabButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = this.getAttribute('data-bs-target');
-            
-            // Esconder todas as abas
-            document.querySelectorAll('#movementTabsContent .tab-pane').forEach(pane => {
-                pane.classList.remove('show', 'active');
-            });
-            
-            // Mostrar a aba clicada
-            const targetPane = document.querySelector(target);
-            if (targetPane) {
-                targetPane.classList.add('show', 'active');
-            }
-            
-            // Atualizar estado ativo dos botões
-            dashboardTabButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-});
-
-
-        
+}       
     </script>
 </body>
 </html>
+
 
 
 
