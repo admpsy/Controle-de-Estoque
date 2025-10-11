@@ -734,6 +734,43 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
+
+/* CORREÇÃO ESPECÍFICA PARA AS ABAS DO DASHBOARD */
+#movementTabs {
+    border-bottom: 1px solid var(--border-color);
+}
+
+#movementTabs .nav-link {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+#movementTabs .nav-link:hover {
+    border-color: var(--border-color) var(--border-color) transparent;
+    color: var(--text-color);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#movementTabs .nav-link.active {
+    background-color: var(--card-bg);
+    border-color: var(--border-color) var(--border-color) var(--card-bg);
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+#movementTabsContent {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 20px;
+}
+        
     </style>
 </head>
 <body>
@@ -4173,5 +4210,6 @@
     </script>
 </body>
 </html>
+
 
 
