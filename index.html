@@ -734,22 +734,38 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
-
-/* CORREÇÃO RADICAL - REMOVER TRANSITIONS PROBLEMÁTICAS */
-#movementTabsContent .tab-pane {
-    transition: none !important;
+        
+/* CORREÇÃO DAS ABAS DO DASHBOARD */
+.nav-tabs .nav-link {
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    background-color: transparent;
 }
 
-.fade:not(.show) {
-    opacity: 1 !important;
+.nav-tabs .nav-link:hover {
+    color: var(--text-color);
+    border-color: var(--border-color);
 }
 
-.tab-content > .tab-pane {
-    display: none;
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: var(--card-bg);
+    border-color: var(--border-color) var(--border-color) var(--card-bg);
+    font-weight: 600;
 }
 
-.tab-content > .active {
-    display: block;
+.tab-content {
+    background-color: var(--card-bg);
+    min-height: 200px; /* Garante que tenha altura mínima */
+}
+
+.tab-pane {
+    padding: 0;
+}
+
+/* Remove transições problemáticas */
+.tab-pane.fade {
+    transition: none;
 }
         
     </style>
@@ -877,50 +893,42 @@
     </li>
 </ul>
 <div class="tab-content mt-3" id="movementTabsContent">
-    <div class="tab-pane fade show active" id="paletes-tab-pane" role="tabpanel" 
-         aria-labelledby="paletes-tab" tabindex="0">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Data</th>
-                                                        <th>Tipo</th>
-                                                        <th>Movimento</th>
-                                                        <th>Quantidade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recent-paletes-movements">
-                                                    <tr>
-                                                        <td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="products-tab-pane" role="tabpanel">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Data</th>
-                                                        <th>Produto</th>
-                                                        <th>Tipo</th>
-                                                        <th>Movimento</th>
-                                                        <th>Quantidade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="recent-products-movements">
-                                                    <tr>
-                                                        <td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="tab-pane fade show active" id="paletes-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Movimento</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-paletes-movements">
+                    <!-- CONTEÚDO SERÁ CARREGADO VIA JAVASCRIPT -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="products-tab-pane" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Movimento</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-products-movements">
+                    <!-- CONTEÚDO SERÁ CARREGADO VIA JAVASCRIPT -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
                     <div class="col-md-4 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -2166,65 +2174,72 @@
             // Atualizar lista de produtos com vencimento próximo ou vencidos
             updateExpiringProductsList(expiringProducts);
             
-            // Movimentações recentes de paletes (últimas 5)
-            const recentPaletesMovements = [];
-            paletesData.forEach(report => {
-                report.items.forEach(item => {
-                    recentPaletesMovements.push({
-                        date: report.date,
-                        type: item.type,
-                        movement: item.movement,
-                        quantity: item.quantity
-                    });
-                });
+           // MOVIMENTAÇÕES RECENTES DE PALETES (ÚLTIMAS 5)
+    const recentPaletesMovements = [];
+    paletesData.forEach(report => {
+        report.items.forEach(item => {
+            recentPaletesMovements.push({
+                date: report.date,
+                type: item.type,
+                movement: item.movement,
+                quantity: item.quantity
             });
-            
-            // Ordenar por data (mais recente primeiro) e pegar as últimas 5
-            recentPaletesMovements.sort((a, b) => new Date(b.date) - new Date(a.date));
-            const recentPaletes = recentPaletesMovements.slice(0, 5);
-            
-            const paletesTbody = document.getElementById('recent-paletes-movements');
-            paletesTbody.innerHTML = '';
-            
-            if (recentPaletes.length === 0) {
-                paletesTbody.innerHTML = '<tr><td colspan="4" class="text-center">Nenhuma movimentação de paletes recente</td></tr>';
-            } else {
-                recentPaletes.forEach(movement => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${formatDate(movement.date)}</td>
-                        <td>${movement.type}</td>
-                        <td>${movement.movement}</td>
-                        <td>${movement.quantity}</td>
-                    `;
-                    paletesTbody.appendChild(row);
-                });
-            }
-            
-            // Movimentações recentes de produtos (últimas 5)
-            const recentProducts = movementHistory
-                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                .slice(0, 5);
-            
-            const productsTbody = document.getElementById('recent-products-movements');
-            productsTbody.innerHTML = '';
-            
-            if (recentProducts.length === 0) {
-                productsTbody.innerHTML = '<tr><td colspan="5" class="text-center">Nenhuma movimentação de produtos recente</td></tr>';
-            } else {
-                recentProducts.forEach(movement => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${formatDate(movement.date)}</td>
-                        <td>${movement.productName}</td>
-                        <td>${movement.productType}</td>
-                        <td>${movement.movementType}</td>
-                        <td>${movement.quantity}</td>
-                    `;
-                    productsTbody.appendChild(row);
-                });
-            }
-        }
+        });
+    });
+    
+    // Ordenar por data (mais recente primeiro) e pegar as últimas 5
+    recentPaletesMovements.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const recentPaletes = recentPaletesMovements.slice(0, 5);
+    
+    const paletesTbody = document.getElementById('recent-paletes-movements');
+    paletesTbody.innerHTML = '';
+    
+    if (recentPaletes.length === 0) {
+        paletesTbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Nenhuma movimentação de paletes recente</td></tr>';
+    } else {
+        recentPaletes.forEach(movement => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${formatDate(movement.date)}</td>
+                <td>${movement.type}</td>
+                <td>
+                    <span class="movement-badge movement-${movement.movement.toLowerCase()}">
+                        ${movement.movement}
+                    </span>
+                </td>
+                <td>${movement.quantity}</td>
+            `;
+            paletesTbody.appendChild(row);
+        });
+    }
+    
+    // MOVIMENTAÇÕES RECENTES DE PRODUTOS (ÚLTIMAS 5)
+    const recentProducts = movementHistory
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+    
+    const productsTbody = document.getElementById('recent-products-movements');
+    productsTbody.innerHTML = '';
+    
+    if (recentProducts.length === 0) {
+        productsTbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Nenhuma movimentação de produtos recente</td></tr>';
+    } else {
+        recentProducts.forEach(movement => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${formatDate(movement.date)}</td>
+                <td>${movement.productName}</td>
+                <td>${movement.productType}</td>
+                <td>
+                    <span class="movement-badge movement-${movement.movementType.toLowerCase()}">
+                        ${movement.movementType}
+                    </span>
+                </td>
+                <td>${movement.quantity}</td>
+            `;
+            productsTbody.appendChild(row);
+        });
+    }
         
         // Função para atualizar a lista de produtos com vencimento próximo ou vencidos
         function updateExpiringProductsList(expiringProducts) {
@@ -4196,6 +4211,7 @@
     </script>
 </body>
 </html>
+
 
 
 
