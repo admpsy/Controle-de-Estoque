@@ -2621,7 +2621,7 @@
             
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movientação BlueWay', 14, yPosition);
+            doc.text('Relatório de Movimentação BlueWay', 14, yPosition);
             
             doc.save('relatorio_paletes.pdf');
             alert('PDF de movimentação de paletes gerado com sucesso!');
@@ -2666,7 +2666,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2711,7 +2711,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -2846,7 +2846,7 @@
             
             // Adicionar linha de créditos
             data.push([]);
-            data.push(['Relatório de Movientação BlueWay']);
+            data.push(['Relatório de Movimentação BlueWay']);
             
             // Criar planilha
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -3482,7 +3482,7 @@
             const finalY = doc.lastAutoTable.finalY + 20;
             doc.setFontSize(10);
             doc.setTextColor(100);
-            doc.text('Relatório de Movientação BlueWay', 14, finalY);
+            doc.text('Relatório de Movimentação BlueWay', 14, finalY);
             
             // Salvar o PDF
             const fileName = `relatorio_movimentacao_${reportNumber}_${reportDate}.pdf`;
@@ -4083,7 +4083,7 @@
             });
             
             // Remover produtos com quantidade zero
-            productsData = productsData.filter(p => p.Quantidade > 0);
+           // productsData = productsData.filter(p => p.Quantidade > 0);
             
             // Salvar no localStorage
             localStorage.setItem('productsData', JSON.stringify(productsData));
@@ -4173,5 +4173,6 @@
     </script>
 </body>
 </html>
+
 
 
