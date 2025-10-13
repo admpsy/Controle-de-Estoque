@@ -2208,7 +2208,34 @@
             }
         }
         // ADICIONAR AO SCRIPT PRINCIPAL
+// Configurar event listeners para produtos segregados
+function setupSegregatedEventListeners() {
+    // Botão para adicionar nova segregação
+    document.getElementById('add-segregated-product').addEventListener('click', function() {
+        openSegregatedProductModal();
+    });
 
+    // Filtros
+    document.getElementById('apply-segregated-filters').addEventListener('click', function() {
+        loadSegregatedProductsData();
+    });
+
+    document.getElementById('reset-segregated-filters').addEventListener('click', function() {
+        document.getElementById('segregated-filter-status').value = '';
+        document.getElementById('segregated-filter-motivo').value = '';
+        document.getElementById('segregated-filter-responsavel').value = '';
+        document.getElementById('segregated-filter-search').value = '';
+        document.getElementById('segregated-filter-data-inicio').value = '';
+        document.getElementById('segregated-filter-data-fim').value = '';
+        loadSegregatedProductsData();
+    });
+
+    // Exportações
+    document.getElementById('generate-segregated-pdf').addEventListener('click', generateSegregatedPDF);
+    document.getElementById('generate-segregated-excel').addEventListener('click', generateSegregatedExcel);
+}
+
+        
 // Inicializar dados de produtos segregados
 function initializeSegregatedData() {
     if (!localStorage.getItem('segregatedProductsData')) {
@@ -3086,6 +3113,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('new-product-manufacturing-date').value = today;
                 new bootstrap.Modal(document.getElementById('addProductModal')).show();
             });
+    // Produtos
+    document.getElementById('add-product').addEventListener('click', function() {
+        document.getElementById('add-product-form').reset();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('new-product-manufacturing-date').value = today;
+        new bootstrap.Modal(document.getElementById('addProductModal')).show();
+    });
             
             document.getElementById('save-new-product').addEventListener('click', addNewProduct);
             document.getElementById('save-lote').addEventListener('click', saveLote);
@@ -3180,7 +3214,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Upload de fotos
             document.getElementById('photos').addEventListener('change', handlePhotoUpload);
         }
-        
+            // ============ ADICIONAR ESTA LINHA ============
+    setupSegregatedEventListeners();
+}
         // Array para armazenar os produtos (para a tela de movimentação)
         let productsList = [];
         
@@ -5342,6 +5378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 </body>
 </html>
+
 
 
 
